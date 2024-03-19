@@ -1,0 +1,8 @@
+@import "reset.scss";
+@import "font.scss";
+
+html, body, #__nuxt {
+   height: 100%; 
+   font-family: "Open Sans", sans-serif;
+   font-weight: bold;
+}

@@ -6,12 +6,12 @@
       </OperationUnit>
       <OperationUnit>
         <p>SIZE:</p>
-        <SizeController />
+        <SizeController v-model="size" />
         <p>px</p>
       </OperationUnit>
       <OperationUnit>
         <p>COLOR:</p>
-        <ColorController />
+        <ColorController @change-color="changeColor" />
       </OperationUnit>
     </OperationList>
     <div class="ellipse-button" @click="toggleOperationBar" :class="{ 'collapsed': !isOperationBarVisible }">
@@ -24,9 +24,15 @@
 
 <script setup lang="ts">
 const isOperationBarVisible = ref(true)
+const size = defineModel('size')
+const emit = defineEmits(['changeColor'])
 
 const toggleOperationBar = () => {
   isOperationBarVisible.value = !isOperationBarVisible.value
+}
+
+const changeColor = (val: string) => {
+  emit('changeColor', val)
 }
 </script>
 

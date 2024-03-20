@@ -1,8 +1,12 @@
 <template>
   <div class="size-controller">
-    <input type="text" />
+    <input type="number" v-model="model" oninput="if (value < 1) value = 1" />
   </div>
 </template>
+
+<script setup lang="ts">
+const model = defineModel()
+</script>
 
 <style lang="scss">
 .size-controller {

@@ -1,14 +1,15 @@
 <template>
 	<div 
 		class="operation-unit" 
-		:class="{'operation-unit__pointer': props.pointer}">
+		:class="{'operation-unit__pointer': props.pointer, 'operation-unit__disabled': props.disabled}">
 		<slot></slot>
 	</div>
 </template>
 
 <script setup>
 	const props = defineProps({
-		pointer: Boolean
+		pointer: Boolean,
+		disabled: Boolean
 	})
 </script>
 
@@ -22,6 +23,11 @@
 
 			&__pointer {
 				cursor: pointer;
+			}
+
+			&__disabled {
+				color: gray;
+				cursor: not-allowed;
 			}
     }
   }

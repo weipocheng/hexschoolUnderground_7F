@@ -1,19 +1,19 @@
 <template>
   <div class="operation-bar-upper" :class="{'collapsed': !isOperationBarVisible}">
     <OperationList>
-      <OperationUnit pointer>
+      <OperationUnit pointer @click="save">
         <Icon name="fa-solid:save" size="36" />
         <p>SAVE</p>
       </OperationUnit>
-      <OperationUnit pointer>
+      <OperationUnit pointer @click="clear">
         <Icon name="icon-park-solid:clear" size="36" />
         <p>CLEAR ALL</p>
       </OperationUnit>
-      <OperationUnit pointer>
+      <OperationUnit :pointer="!undoListIsEmpty" :disabled="undoListIsEmpty" @click="undo" >
         <Icon name="ion:md-undo" size="36" />
         <p>UNDO</p>
       </OperationUnit>
-      <OperationUnit pointer>
+      <OperationUnit :pointer="!redoListIsEmpty" :disabled="redoListIsEmpty" @click="redo" >
         <Icon name="ion:md-redo" size="36" />
         <p>REDO</p>
       </OperationUnit>
@@ -25,10 +25,36 @@
 </template>
 
 <script setup lang="ts">
+import { ArrayOperationEnum } from "@/assets/ts/enums/arrayOperationEnum"
+
+const props = defineProps(['undoList', 'redoList'])
+const emit = defineEmits(['changeUndoList', 'changeRedoList', 'clear', 'save'])
+
 const isOperationBarVisible = ref(true)
 
 const toggleOperationBar = () => {
   isOperationBarVisible.value = !isOperationBarVisible.value
+}
+
+const undoListIsEmpty = computed(() => props.undoList.length === 0)
+const redoListIsEmpty = computed(() => props.redoList.length === 0)
+
+const undo = () => {
+  if (undoListIsEmpty.value) return
+  emit('changeUndoList', { method: ArrayOperationEnum.Pop })
+}
+
+const redo = () => {
+  if (redoListIsEmpty.value) return
+  emit('changeRedoList')
+}
+
+const clear = () => {
+  emit('clear')
+}
+
+const save = () => {
+  emit('save')
 }
 </script>
 

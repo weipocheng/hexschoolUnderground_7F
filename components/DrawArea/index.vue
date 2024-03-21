@@ -6,11 +6,14 @@
 </template>
 
 <script setup lang="ts">
+import { ArrayOperationEnum } from '@/assets/ts/enums/arrayOperationEnum'
+
 const prop = defineProps({
-  lineWatch: Number,
+  lineWidth: Number,
   strokeStyle: String
 })
 
+const emit = defineEmits(['changeUndoList', 'clearRedoList'])
 
 interface Canvas {
   startX: number;
@@ -40,7 +43,7 @@ onMounted(() => {
   resizeCanvas()
 })
 
-watch(() => prop.lineWatch, cur => {
+watch(() => prop.lineWidth, cur => {
   if (cur) {
     canvasData.lineWidth = cur
   }
@@ -65,10 +68,9 @@ const handleMouseDown = (e: MouseEvent) => {
   canvasData.startY = e.clientY
 
   if (ctx.value) {
-    console.log(ctx.value);
     ctx.value.lineWidth = canvasData.lineWidth
     ctx.value.strokeStyle = canvasData.strokeStyle
-    
+
     ctx.value.beginPath()
     ctx.value.moveTo(canvasData.startX, canvasData.startY)
   }
@@ -89,7 +91,47 @@ const handleMouseMove = (e: MouseEvent) => {
 const handleMouseUp = (e: MouseEvent) => {
   if (!isDragging.value) return
   isDragging.value = false
+
+  emit('clearRedoList')
+  
+  emit('changeUndoList', { method: ArrayOperationEnum.Push, image: getSnapShot() })
 }
+
+const getSnapShot = () => {
+  const img = new Image
+
+  if (canvas.value) {
+    img.src = canvas.value.toDataURL()
+  }
+
+  return img
+}
+
+const rePaint = (image: HTMLImageElement) => {
+  clear()
+
+  if (!ctx.value || !image) return
+  ctx.value.drawImage(image, 0, 0)
+}
+
+const clear = () => {
+  if (!canvas.value || !ctx.value) return
+  ctx.value.clearRect(0,0,canvas.value.width, canvas.value.height)
+}
+
+const save = () => {
+  const a = document.createElement('a')
+  a.href = getSnapShot().src
+  a.download = `${Date.now()}.png`
+  a.click()
+}
+
+defineExpose({
+  rePaint,
+  clear,
+  save
+})
+
 </script>
 
 <style lang="scss">
@@ -97,4 +139,4 @@ const handleMouseUp = (e: MouseEvent) => {
   width: 100%;
   height: 100%;
 }
-</style>
+</style>~/assets/ts/enums/arrayOperationEnum

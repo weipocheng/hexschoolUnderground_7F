@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <OperationBarUpper :undo-list="undoList" :redo-list="redoList" @change-undo-list="changeUndoList"
-      @change-redo-list="changeRedoList" @clear="clear" @save="save" />
+      @change-redo-list="changeRedoList" @clear="clear" @save="save" @called-re-paint="calledRePaint" />
     <OperationBarLower v-model:size="size" @change-color="changeColor" />
     <DrawArea ref="drawArea" :line-width="size" :stroke-style="color" @change-undo-list="changeUndoList"
       @clear-redo-list="clearRedoList" />
@@ -9,8 +9,8 @@
 </template>
 
 <script setup lang="ts">
-import { type ChangeList } from '@/assets/ts/interfaces/changeListInterface'
-import { ArrayOperationEnum } from '@/assets/ts/enums/arrayOperationEnum'
+import { type ChangeList } from '@/assets/ts/interfaces/'
+import { ArrayOperationEnum } from '@/assets/ts/enums/'
 
 useHead({
   title: '7F-畫版',
@@ -36,12 +36,18 @@ const changeUndoList = (data: ChangeList) => {
     if (popElement) {
       redoList.value.push(popElement)
     }
-    drawArea.value.rePaint(undoList.value[undoList.value.length - 1])
+
+    if (undoList.value[undoList.value.length - 1]) {
+      drawArea.value.rePaint(undoList.value[undoList.value.length - 1])
+    } else {
+      drawArea.value.clear()
+    }
   }
 }
 
 const changeRedoList = () => {
   const popElement = redoList.value.pop()
+  
   if (popElement) {
     undoList.value.push(popElement)
   }
@@ -60,6 +66,10 @@ const clear = () => {
 
 const save = () => {
   drawArea.value.save()
+}
+
+const calledRePaint = (image: HTMLImageElement) => {
+  drawArea.value.handleUpload(image)
 }
 </script>
 

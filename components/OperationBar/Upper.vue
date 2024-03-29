@@ -1,5 +1,5 @@
 <template>
-  <div class="operation-bar-upper" :class="{'collapsed': !isOperationBarVisible}">
+  <div class="operation-bar-upper" :class="{ 'collapsed': !isOperationBarVisible }">
     <OperationList>
       <OperationUnit pointer @click="save">
         <Icon name="fa-solid:save" size="36" />
@@ -9,26 +9,33 @@
         <Icon name="icon-park-solid:clear" size="36" />
         <p>CLEAR ALL</p>
       </OperationUnit>
-      <OperationUnit :pointer="!undoListIsEmpty" :disabled="undoListIsEmpty" @click="undo" >
+      <OperationUnit :pointer="!undoListIsEmpty" :disabled="undoListIsEmpty" @click="undo">
         <Icon name="ion:md-undo" size="36" />
         <p>UNDO</p>
       </OperationUnit>
-      <OperationUnit :pointer="!redoListIsEmpty" :disabled="redoListIsEmpty" @click="redo" >
+      <OperationUnit :pointer="!redoListIsEmpty" :disabled="redoListIsEmpty" @click="redo">
         <Icon name="ion:md-redo" size="36" />
         <p>REDO</p>
       </OperationUnit>
+      <OperationUnit pointer>
+        <input type="file" accept="image/*" id="file" style="display: none;" @change="upload">
+        <Icon name="ic:outline-file-upload" size="36" />
+        <label for="file">UPLOAD</label>
+      </OperationUnit>
     </OperationList>
     <div class="ellipse-button" @click="toggleOperationBar">
-      <Icon :name="isOperationBarVisible ? 'material-symbols:keyboard-arrow-up' : 'material-symbols:keyboard-arrow-down'" size="24" />
+      <Icon
+        :name="isOperationBarVisible ? 'material-symbols:keyboard-arrow-up' : 'material-symbols:keyboard-arrow-down'"
+        size="24" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ArrayOperationEnum } from "@/assets/ts/enums/arrayOperationEnum"
+import { ArrayOperationEnum } from "@/assets/ts/enums/"
 
 const props = defineProps(['undoList', 'redoList'])
-const emit = defineEmits(['changeUndoList', 'changeRedoList', 'clear', 'save'])
+const emit = defineEmits(['changeUndoList', 'changeRedoList', 'clear', 'save', 'calledRePaint'])
 
 const isOperationBarVisible = ref(true)
 
@@ -38,6 +45,26 @@ const toggleOperationBar = () => {
 
 const undoListIsEmpty = computed(() => props.undoList.length === 0)
 const redoListIsEmpty = computed(() => props.redoList.length === 0)
+
+const upload = (e: Event) => {
+  const target = e.target as HTMLInputElement
+  if (target && target.files) {    
+    
+    const reader = new FileReader();
+
+    reader.readAsDataURL(target.files[0])
+
+    reader.onload = () => {
+      // console.log(reader.result);
+
+      const img = new Image
+
+      img.src = reader.result as string
+
+      emit('calledRePaint', img)
+    }
+  }
+}
 
 const undo = () => {
   if (undoListIsEmpty.value) return

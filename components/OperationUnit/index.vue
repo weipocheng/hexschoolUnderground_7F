@@ -23,6 +23,10 @@
 
 			&__pointer {
 				cursor: pointer;
+
+				label {
+					cursor: pointer;
+				}
 			}
 
 			&__disabled {

@@ -6,7 +6,8 @@
 </template>
 
 <script setup lang="ts">
-import { ArrayOperationEnum } from '@/assets/ts/enums/arrayOperationEnum'
+import { ArrayOperationEnum } from '@/assets/ts/enums/'
+import { type Canvas } from '@/assets/ts/interfaces/'
 
 const prop = defineProps({
   lineWidth: Number,
@@ -14,15 +15,6 @@ const prop = defineProps({
 })
 
 const emit = defineEmits(['changeUndoList', 'clearRedoList'])
-
-interface Canvas {
-  startX: number;
-  startY: number;
-  endX: number;
-  endY: number;
-  lineWidth: number;
-  strokeStyle: string;
-}
 
 const canvasData: Canvas = reactive({
   startX: 0,
@@ -92,11 +84,21 @@ const handleMouseUp = (e: MouseEvent) => {
   if (!isDragging.value) return
   isDragging.value = false
 
+  handleUndoRedoStates()
+}
+
+/**
+ * 處理 Undo 和 Redo 操作的狀態
+ */
+const handleUndoRedoStates = () => {
   emit('clearRedoList')
-  
+
   emit('changeUndoList', { method: ArrayOperationEnum.Push, image: getSnapShot() })
 }
 
+/**
+ * 取得當前canvas快照
+ */
 const getSnapShot = () => {
   const img = new Image
 
@@ -109,14 +111,21 @@ const getSnapShot = () => {
 
 const rePaint = (image: HTMLImageElement) => {
   clear()
-
   if (!ctx.value || !image) return
   ctx.value.drawImage(image, 0, 0)
 }
 
+const handleUpload = (image: HTMLImageElement) => {
+  image.onload = () => {
+    if (!ctx.value || !image) return
+    ctx.value.drawImage(image, 0, 0)
+    handleUndoRedoStates()
+  }
+}
+
 const clear = () => {
   if (!canvas.value || !ctx.value) return
-  ctx.value.clearRect(0,0,canvas.value.width, canvas.value.height)
+  ctx.value.clearRect(0, 0, canvas.value.width, canvas.value.height)
 }
 
 const save = () => {
@@ -129,7 +138,8 @@ const save = () => {
 defineExpose({
   rePaint,
   clear,
-  save
+  save,
+  handleUpload
 })
 
 </script>
@@ -139,4 +149,4 @@ defineExpose({
   width: 100%;
   height: 100%;
 }
-</style>~/assets/ts/enums/arrayOperationEnum
+</style>

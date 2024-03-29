@@ -6,12 +6,10 @@
 </template>
 
 <script setup lang="ts">
+import { type ColorItem } from '@/assets/ts/interfaces/'
+
 const emit = defineEmits(['changeColor'])
 
-interface ColorItem {
-  color: string;
-  selected: boolean;
-}
 const colorList: ColorItem[] = reactive([
   {
     color: '#fff',
@@ -34,6 +32,7 @@ const colorList: ColorItem[] = reactive([
     selected: false,
   }
 ])
+
 const chooseColor = (selectedUnit: ColorItem) => {
   const oldSelectedUnit: ColorItem | undefined = colorList.find((e) => e.selected);
 
